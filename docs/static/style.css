@@ -1,0 +1,15 @@
+/*
+Author: Khalil Kilani
+Course: CSCI 3725
+Assignment: M9 - Another Kind of CC
+Date: December 19, 2024
+
+Module to apply styling to HTML elements of webpages.
+*/
+
+
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
