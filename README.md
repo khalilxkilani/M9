@@ -1,5 +1,5 @@
 **Link to Public GitHub Repository:** [https://github.com/khalilxkilani/M9.git](https://github.com/khalilxkilani/M9.git) \
-**Link to GitHub Pages Website:** [https://khalilxkilani.github.io/M9/](https://khalilxkilani.github.io/M9/)
+**Link to GitHub Pages Website:** [https://khalilxkilani.github.io/M9/](https://khalilxkilani.github.io/M9/) \
 **Link to Demo Video:** Presentation
 
 # M9: Another Kind of CC
