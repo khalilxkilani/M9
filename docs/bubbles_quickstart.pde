@@ -10,7 +10,7 @@ int currentBubble = 0;
 boolean is_paused = false;
 
 void setup() {
-    fullScreen();
+    fullScreen(P2D);
 }
 
 void draw() {
