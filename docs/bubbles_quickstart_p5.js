@@ -10,6 +10,11 @@ function setup() {
     createCanvas(innerWidth, innerHeight);
 }
 
+// Resize the canvas when the website's size changes.
+function windowResized() {
+    resizeCanvas(windowWidth, windowHeight);
+}
+
 function draw() {
     // Clear the background.
     background(0, 0, 0);
