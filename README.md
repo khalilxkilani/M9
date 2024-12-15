@@ -32,6 +32,4 @@ Text.
 Text.
 
 ### Sources:
-* a
-* b
-* c
+* [Processing Reference](https://processing.org/reference) on Processing.
