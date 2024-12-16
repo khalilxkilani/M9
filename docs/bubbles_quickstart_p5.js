@@ -1,9 +1,5 @@
 // Create an array of Bubbles.
 let theBubbles = [];
-// How many Bubbles we have already created.
-let numBubbles = 0;
-// The current index position in our Bubble array.
-let currentBubble = 0;
 let is_paused = false;
 
 function setup() {
@@ -23,25 +19,16 @@ function draw() {
     if (mouseIsPressed && !is_paused) {
         // Create a Bubble and add it to the current index in our array.
         // The Bubble should be placed where the user clicked.
-        theBubbles[currentBubble] = new Bubble(this, mouseX, mouseY);
-        
-        // Increase the current index to get ready for the next Bubble.
-        currentBubble++;
-
-        // Increase our total bubbles in play, if we haven't filled the array yet.
-        if (numBubbles < theBubbles.length){
-            numBubbles++;
-        }
+        theBubbles.push(new Bubble(this, mouseX, mouseY));
     }
 		
-		check_pause();
-		for (var i = 0; i < numBubbles; i++){
-				if (!is_paused) {
-						theBubbles[i].move();
-				}
-				// theBubbles[i].move();
-				theBubbles[i].display();
-		}
+    check_pause();
+    theBubbles.forEach((bubble) => {
+        if (!is_paused) {
+            bubble.move();
+        }
+        bubble.display();
+    });
 	
 
 }
@@ -77,21 +64,21 @@ class Bubble {
         this.speedY = this.canvas.random(-5, 5);
     }
 	
-		display() {
-			// This method specifies our Bubble will not have an outline.
-			this.canvas.noStroke();
+    display() {
+        // This method specifies our Bubble will not have an outline.
+        this.canvas.noStroke();
 
-			// Specifies the fill for the Bubble.
-			this.canvas.fill(this.myRed, this.myGreen, this.myBlue);
+        // Specifies the fill for the Bubble.
+        this.canvas.fill(this.myRed, this.myGreen, this.myBlue);
 
-			// Draws an ellipse on the screen to represent our Bubble.
-			this.canvas.ellipse(this.x, this.y, this.size, this.size);
-		}
-	
-		move() {
-			// Updates position based on speed.
-			this.x += this.speedX;
-			this.y += this.speedY;
-		}
+        // Draws an ellipse on the screen to represent our Bubble.
+        this.canvas.ellipse(this.x, this.y, this.size, this.size);
+    }
+
+    move() {
+        // Updates position based on speed.
+        this.x += this.speedX;
+        this.y += this.speedY;
+    }
 
 }
