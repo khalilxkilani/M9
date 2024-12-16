@@ -40,3 +40,5 @@ Text.
 * [Drawing Lines](https://p5js.org/examples/animation-and-variables-drawing-lines/) on p5.js.
 * [1.4 Draw With Mouse](https://nycdoe-cs4all.github.io/units/2/lessons/lesson_1.4) on NYC Department of Education.
 * [endShape()](https://p5js.org/reference/p5/endShape/) on p5.js.
+* [2.6: createGraphics() - p5.js Tutorial](https://youtu.be/TaluaAD9MKA?si=-PxropzQQv_ftfrA) on The Coding Train.
+* [Create Graphics](https://p5js.org/examples/advanced-canvas-rendering-create-graphics/) on p5.js.
