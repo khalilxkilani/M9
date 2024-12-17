@@ -13,7 +13,8 @@ let is_drawing = false;
 let sky_layer;
 let draw_stroke_layer;
 let prev_num_clouds = -1;
-const COLOR_CHANGE_RATE = 10;
+const SKY_COLOR_CHANGE_RATE = 10;
+const TRANSPARENCY_CHANGE_RATE = 1;
 
 
 // Initialize canvas and drawing buffer at the start of every new sketch.
@@ -95,6 +96,7 @@ function draw() {
         if (!is_paused) { // Only move clouds if user has allowed movement
             cloud.move();
         }
+        cloud.dissipate();
         cloud.display();
     });
 }
@@ -114,11 +116,11 @@ function sky_gradient(is_window_resized = false) {
     }
 
     // Adjust B value down for darker, up for lighter
-    let blue_hue = color(0, 150 - (num_clouds * COLOR_CHANGE_RATE),
-        255 - (num_clouds * COLOR_CHANGE_RATE));
+    let blue_hue = color(0, 150 - (num_clouds * SKY_COLOR_CHANGE_RATE),
+        255 - (num_clouds * SKY_COLOR_CHANGE_RATE));
 
     // Adjust R,G,B values down for darker, up for lighter
-    let grey_RGB_value = 225 - (num_clouds * COLOR_CHANGE_RATE);
+    let grey_RGB_value = 225 - (num_clouds * SKY_COLOR_CHANGE_RATE);
     let grey_hue = color(grey_RGB_value, grey_RGB_value, grey_RGB_value);
 
     // Draw horizontal lines per height pixel using a different blue-grey blend
@@ -152,6 +154,9 @@ class Cloud {
         this.canvas = canvas; // Store a reference to the canvas
         this.coordinates = coordinates; // Coordinates of the bounding line
 
+        this.vectors = [];
+        this.transparency = 255;
+
         // TODO: change speed
         this.speedX = this.canvas.random(-5, 5);
         this.speedY = this.canvas.random(-5, 5);
@@ -159,17 +164,24 @@ class Cloud {
 
     display() {
         // Specify the fill color for the Cloud
-        fill(255, 0, 0);
+        fill(255, 0, 0, this.transparency);
+        noStroke();
+
+        this.vectors = []; // Reset vectors
 
         // Draw the cloud by connecting all the line coordinates with vertices
         beginShape();
         this.coordinates.forEach((coordinate) => {
             // Every 60 frames, offset the coordinates to perform wiggle effect
             if (frameCount % 60 === 0) {
-                coordinate[0] += random(-4, 4);
-                coordinate[1] += random(-4, 4);
+                coordinate[0] += random(-10, 10) * noise(0.05 * frameCount);
+                coordinate[1] += random(-5, 5) * noise(0.05 * frameCount);
             }
             curveVertex(coordinate[0], coordinate[1]); // Connect using a vertex
+
+            // Update vectors
+            let curr_vector = createVector(coordinate[0], coordinate[1]);
+            this.vectors.push(curr_vector);
         });
         endShape(CLOSE); // Connect first and last vertices
     }
@@ -186,5 +198,14 @@ class Cloud {
     // Return the first coordinate pair (x, y) of the cloud.
     get_first_coord_pair() {
         return this.coordinates[0];
+    }
+
+    // If mouse hovers over cloud, make it turn transparent
+    dissipate() {
+        // Check if mouse collides with cloud
+        let hit = collidePointPoly(mouseX, mouseY, this.vectors);
+        if (hit) {
+            this.transparency -= TRANSPARENCY_CHANGE_RATE; // Decrease alpha value
+        }
     }
 }

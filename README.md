@@ -7,7 +7,7 @@ CSCI 3725: Computational Creativity \
 Khalil Kilani \
 December 19, 2024
 
-# TITLE
+# SkySonder
 Description.
 
 ***
@@ -46,3 +46,5 @@ Text.
 * [Color Picker](https://htmlcolorcodes.com) on HTML Color Codes.
 * [Sunny Icon ICO](https://www.shareicon.net/sunny-307412) on ShareIcon.
 * [How to Create and Implement an HTML Favicon](https://www.dhiwise.com/post/how-to-create-and-implement-an-html-favicon) on DhiWise.
+* [noise()](https://p5js.org/reference/p5/noise/) on p5.js.
+* [p5.collide2D Library](https://github.com/bmoren/p5.collide2D.git) on GitHub.
