@@ -42,3 +42,5 @@ Text.
 * [endShape()](https://p5js.org/reference/p5/endShape/) on p5.js.
 * [2.6: createGraphics() - p5.js Tutorial](https://youtu.be/TaluaAD9MKA?si=-PxropzQQv_ftfrA) on The Coding Train.
 * [Create Graphics](https://p5js.org/examples/advanced-canvas-rendering-create-graphics/) on p5.js.
+* [Color Gradients by Jules Kris and Tristan Bunn](https://p5js.org/tutorials/color-gradients/) on p5.js.
+* [Color Picker](https://htmlcolorcodes.com) on HTML Color Codes.
