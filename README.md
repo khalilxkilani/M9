@@ -44,3 +44,5 @@ Text.
 * [Create Graphics](https://p5js.org/examples/advanced-canvas-rendering-create-graphics/) on p5.js.
 * [Color Gradients by Jules Kris and Tristan Bunn](https://p5js.org/tutorials/color-gradients/) on p5.js.
 * [Color Picker](https://htmlcolorcodes.com) on HTML Color Codes.
+* [Sunny Icon ICO](https://www.shareicon.net/sunny-307412) on ShareIcon.
+* [How to Create and Implement an HTML Favicon](https://www.dhiwise.com/post/how-to-create-and-implement-an-html-favicon) on DhiWise.

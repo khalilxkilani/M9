@@ -13,7 +13,7 @@ let is_drawing = false;
 let sky_layer;
 let draw_stroke_layer;
 let prev_num_clouds = -1;
-const COLOR_CHANGE_RATE = 5;
+const COLOR_CHANGE_RATE = 10;
 
 
 // Initialize canvas and drawing buffer at the start of every new sketch.
@@ -47,7 +47,7 @@ function windowResized() {
 
 // Check if the user has paused movement to save their creation.
 function check_pause() {
-    if (isKeyPressed && keyCode == UP_ARROW) { // User pressed up arrow
+    if (isKeyPressed && keyCode === UP_ARROW) { // User pressed up arrow
         is_paused = true;
     } else if (isKeyPressed) {
         is_paused = false;
@@ -164,8 +164,12 @@ class Cloud {
         // Draw the cloud by connecting all the line coordinates with vertices
         beginShape();
         this.coordinates.forEach((coordinate) => {
-            let [xCoord, yCoord] = coordinate; // Unpack x and y coordinates
-            curveVertex(xCoord, yCoord); // Connect using a vertex
+            // Every 60 frames, offset the coordinates to perform wiggle effect
+            if (frameCount % 60 === 0) {
+                coordinate[0] += random(-4, 4);
+                coordinate[1] += random(-4, 4);
+            }
+            curveVertex(coordinate[0], coordinate[1]); // Connect using a vertex
         });
         endShape(CLOSE); // Connect first and last vertices
     }
