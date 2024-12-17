@@ -95,8 +95,8 @@ function draw() {
     clouds.forEach((cloud) => {
         if (!is_paused) { // Only move clouds if user has allowed movement
             cloud.move();
+            cloud.dissipate();
         }
-        cloud.dissipate();
         cloud.display();
     });
 }
