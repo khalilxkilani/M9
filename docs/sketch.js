@@ -238,8 +238,8 @@ function drawStrokeTrail() {
  * Define the blue and grey hues of the sky gradient depending on the number of
  * clouds present.
  * 
- * @param {boolean} is_window_resized true if window has been resized, false otherwise
- * @returns does not execute if number of Clouds has not changed
+ * @param {boolean} is_window_resized true if window resized, false otherwise.
+ * @returns does not execute if number of Clouds has not changed.
  */
 function displaySkyGradient(is_window_resized = false) {
     let numClouds = clouds.length; // Obtain number of Clouds currently visible
@@ -276,7 +276,7 @@ function displaySkyGradient(is_window_resized = false) {
  * Determine if a Cloud is outside of the window bounds.
  * 
  * @param {Cloud} cloud 
- * @returns true if Cloud within bounds, false otherwise
+ * @returns true if Cloud within bounds, false otherwise.
  */
 function checkCloudBounds(cloud) {
     [xCoord, yCoord] = cloud.getCenterCoord();
@@ -295,7 +295,7 @@ function checkCloudBounds(cloud) {
  * Determine if a Cloud has become fully transparent.
  * 
  * @param {Cloud} cloud 
- * @returns true if Cloud is fully transparent, false otherwise
+ * @returns true if Cloud is fully transparent, false otherwise.
  */
 function checkTransparency(cloud) {
     if (cloud.transparency <= 0) {
@@ -314,7 +314,7 @@ class Cloud {
     /**
      * Initialize a new Cloud object.
      * 
-     * @param {*} coordinates coordinates of the bounding line
+     * @param {number[]} coordinates coordinates of the bounding line.
      */
     constructor(coordinates) {
         this.coordinates = coordinates;
@@ -354,8 +354,8 @@ class Cloud {
     /**
      * Scatter the Cloud away toward whichever window quadrant it is in.
      * 
-     * @param {number} newXDir -1 for leftward or 1 for rightward
-     * @param {number} newYDir -1 for up or 1 for down
+     * @param {number} newXDir -1 for leftward or 1 for rightward.
+     * @param {number} newYDir -1 for up or 1 for down.
      */
     scatter(newXDir, newYDir) {
         // Move Cloud out of bounds
@@ -399,7 +399,7 @@ class Cloud {
     /**
      * Identify the center point of the Cloud.
      * 
-     * @returns x and y coordinates of the center of the Cloud
+     * @returns x and y coordinates of the center of the Cloud.
      */
     getCenterCoord() {
         // Set mins and maxes as opposites to ensure correct comparision in loop
