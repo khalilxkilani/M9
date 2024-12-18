@@ -8,7 +8,7 @@
 
 let clouds = [];
 let currLinePoints = []; // Points that define shape of a Cloud
-let strokeTrail = []; // Vectors that define the mouse trail
+let strokeTrail = []; // Coordinates that define the mouse trail
 let cloudColors = [
     [230, 230, 250], [255, 245, 238], [255, 228, 225], [220, 220, 220]
 ]; // RGB values for Lavender, SeaShell, MistyRose, and Gainsboro
@@ -20,8 +20,10 @@ let prevNumClouds = -1; // Set negative so program can use range 0 <= i <= n
 let font;
 let fontsize = 56;
 const SKY_GRADIENT_RATE = 10; // Rate at which gradient changes colors
-const TRANSPARENCY_RATE = 1; // Rate at which clouds lose transparency
+const TRANSPARENCY_RATE = 1; // Rate at which Clouds lose transparency
 const DRAWING_RESISTANCE = 5; // Amount to offset Cloud line points
+const CLOUD_SPEED_RANGE = 2; // Set minimum and maximum of cloud speed
+const SCATTER_SPEED = 20; // Speed at which Clouds scatter upon double click
 
 
 /**
@@ -118,6 +120,33 @@ function checkRestart() {
 
 
 /**
+ * Scatter Clouds off the screen when the user double clicks the mouse.
+ */
+function doubleClicked() {
+    // Assume Cloud is on the bottom right quadrant of window
+    let newXDir = 1;
+    let newYDir = 1;
+
+    // Scatter each Cloud away toward the window quadrant it is closest to
+    clouds.forEach((cloud) => {
+        let [xCoord, yCoord] = cloud.getCenterCoord(); // Middle of Cloud
+
+        // Cloud is on left half of window
+        if (xCoord < (innerWidth / 2)) {
+            newXDir = -1;
+        }
+        // Cloud is on top half of window
+        if (yCoord < (innerHeight / 2)) {
+            newYDir = -1;
+        }
+
+        // Scatter the Cloud away
+        cloud.scatter(newXDir, newYDir);
+    });
+}
+
+
+/**
  * Draw and store the line coordinates of every mouse drag.
  */
 function mouseDragged() {
@@ -125,7 +154,7 @@ function mouseDragged() {
         isDrawing = true;
         // drawStrokeLayer.strokeWeight(2);
 
-        // Add resistance against the user's intended cloud drawing
+        // Add resistance against the user's intended Cloud drawing
         let offset = random(-DRAWING_RESISTANCE, DRAWING_RESISTANCE);
 
         // Make line by connecting previous mouse coordinates
@@ -166,10 +195,11 @@ function draw() {
     checkPause();
     checkRestart();
 
-    // Display each cloud
+    // Remove Clouds that have become fully transparent or moved out of bounds
     clouds = clouds.filter(checkCloudBounds).filter(checkTransparency);
+    // Display each Cloud
     clouds.forEach((cloud) => {
-        if (!isPaused) { // Only move clouds if user has allowed movement
+        if (!isPaused) { // Only move Clouds if user has allowed movement
             cloud.move();
             cloud.dissipate();
         }
@@ -208,13 +238,13 @@ function drawStrokeTrail() {
  * Define the blue and grey hues of the sky gradient depending on the number of
  * clouds present.
  * 
- * @param {*} is_window_resized true if window has been resized, false otherwise
+ * @param {boolean} is_window_resized true if window has been resized, false otherwise
  * @returns does not execute if number of Clouds has not changed
  */
 function displaySkyGradient(is_window_resized = false) {
-    let numClouds = clouds.length; // Obtain number of clouds currently visible
+    let numClouds = clouds.length; // Obtain number of Clouds currently visible
 
-    // Only redraw the sky gradient if the number of clouds has changed
+    // Only redraw the sky gradient if the number of Clouds has changed
     if (!is_window_resized && numClouds === prevNumClouds) {
         return;
     } else {
@@ -249,11 +279,11 @@ function displaySkyGradient(is_window_resized = false) {
  * @returns true if Cloud within bounds, false otherwise
  */
 function checkCloudBounds(cloud) {
-    [xCoord, yCoord] = cloud.getFirstCoordPair();
+    [xCoord, yCoord] = cloud.getCenterCoord();
 
     // Quarter padding around window bounds
-    if (xCoord > (innerWidth * 1.25) || xCoord < -(innerWidth / 4) ||
-        yCoord > (innerHeight * 1.25) || yCoord < -(innerHeight / 4)) {
+    if (xCoord > (innerWidth * 1.5) || xCoord < -(innerWidth / 2) ||
+        yCoord > (innerHeight * 1.5) || yCoord < -(innerHeight / 2)) {
         return false;
     } else {
         return true;
@@ -293,15 +323,49 @@ class Cloud {
         this.color = random(cloudColors);
         this.transparency = 255;
 
-        // TODO: change speed
-        this.speedX = random(-5, 5);
-        this.speedY = random(-5, 5);
+        // Set speed to non-zero value
+        this.setSpeed();
+        while (this.speedX === 0 || this.speedY === 0) {
+            this.setSpeed();
+        }
+
         this.directionX = Math.sign(this.speedX);
         this.directionY = Math.sign(this.speedY);
 
         this.isDirXChanged = false;
         this.isDirYChanged = false;
         this.isTouchingWall = false;
+        this.isScattering = false;
+    }
+
+    /**
+     * Set the speed of the Cloud.
+     */
+    setSpeed() {
+        if (this.isScattering) {
+            this.speedX = SCATTER_SPEED;
+            this.speedY = SCATTER_SPEED;
+        } else {
+            this.speedX = random(-CLOUD_SPEED_RANGE, CLOUD_SPEED_RANGE);
+            this.speedY = random(-CLOUD_SPEED_RANGE, CLOUD_SPEED_RANGE);
+        }
+    }
+
+    /**
+     * Scatter the Cloud away toward whichever window quadrant it is in.
+     * 
+     * @param {number} newXDir -1 for leftward or 1 for rightward
+     * @param {number} newYDir -1 for up or 1 for down
+     */
+    scatter(newXDir, newYDir) {
+        // Move Cloud out of bounds
+        this.directionX = newXDir;
+        this.directionY = newYDir;
+        // Notify move() that Cloud should not be contained by window bounds
+        // and notify setSpeed() that Cloud speed should be absolute
+        this.isScattering = true;
+        // Make Cloud move quicker for scatter effect
+        this.setSpeed();
     }
 
     /**
@@ -333,14 +397,48 @@ class Cloud {
     }
 
     /**
+     * Identify the center point of the Cloud.
+     * 
+     * @returns x and y coordinates of the center of the Cloud
+     */
+    getCenterCoord() {
+        // Set mins and maxes as opposites to ensure correct comparision in loop
+        let minX = innerWidth;
+        let maxX = 0;
+        let minY = innerHeight;
+        let maxY = 0;
+
+        // Find the min and max of the Cloud's x and y coordinates
+        this.coordinates.forEach((coordinate) => {
+            if (coordinate[0] < minX) {
+                minX = coordinate[0];
+            }
+            if (coordinate[0] > maxX) {
+                maxX = coordinate[0];
+            }
+            if (coordinate[1] < minY) {
+                minY = coordinate[1];
+            }
+            if (coordinate[1] > maxY) {
+                maxY = coordinate[1];
+            }
+        });
+
+        // Cloud center point
+        return [(maxX + minX) / 2, (maxY + minY) / 2]
+    }
+
+    /**
      * Move the Cloud.
      */
     move() {
         // Check if any coordinate has surpassed the window boundaries
-        this.coordinates.forEach((coordinate) => {
-            this.checkWallBounceX(coordinate[0]);
-            this.checkWallBounceY(coordinate[1]);
-        });
+        if (!this.isScattering) {
+            this.coordinates.forEach((coordinate) => {
+                this.checkWallBounceX(coordinate[0]);
+                this.checkWallBounceY(coordinate[1]);
+            });
+        }
 
         // Update Cloud positon according to its speed and direction
         this.coordinates.forEach((coordinate) => {
@@ -351,15 +449,6 @@ class Cloud {
         // Enable direction changes on next call to move()
         this.isDirXChanged = false;
         this.isDirYChanged = false;
-    }
-
-    /**
-     * Return the first (x, y) coordinate pair of the cloud.
-     * 
-     * @returns first (x, y) coordinate pair of the cloud.
-     */
-    getFirstCoordPair() {
-        return this.coordinates[0];
     }
 
     /**
@@ -377,7 +466,7 @@ class Cloud {
      * Check if the Cloud should bounce off the left or right bounds of the
      * window.
      * 
-     * @param {*} xCoord a single x coordinate within the Cloud's shape.
+     * @param {number} xCoord a single x coordinate within the Cloud's shape.
      */
     checkWallBounceX(xCoord) {
         if ((xCoord < 0 || xCoord > innerWidth) && !this.isDirXChanged) {
@@ -390,7 +479,7 @@ class Cloud {
      * Check if the Cloud should bounce off the top or bottom bounds of the
      * window.
      * 
-     * @param {*} yCoord a single y coordinate within the Cloud's shape.
+     * @param {number} yCoord a single y coordinate within the Cloud's shape.
      */
     checkWallBounceY(yCoord) {
         if ((yCoord < 0 || yCoord > innerHeight) && !this.isDirYChanged) {
