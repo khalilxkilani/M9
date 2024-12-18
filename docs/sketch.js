@@ -41,14 +41,22 @@ function setup() {
  */
 function windowResized() {
     resizeCanvas(windowWidth, windowHeight);
+    refreshGraphicsLayers();
+}
 
+
+/**
+ * Create new graphics layers for the sky and draw strokes when resizing the
+ * window or resetting the creative space.
+ */
+function refreshGraphicsLayers() {
     skyLayer.remove(); // Remove graphics buffer from web page
     skyLayer = undefined; // Delete graphics buffer from CPU memory
     skyLayer = createGraphics(innerWidth, innerHeight);
     displaySkyGradient(true);
 
-    drawStrokeLayer.remove(); // Remove graphics buffer from web page
-    drawStrokeLayer = undefined; // Delete graphics buffer from CPU memory
+    drawStrokeLayer.remove();
+    drawStrokeLayer = undefined;
     drawStrokeLayer = createGraphics(innerWidth, innerHeight);
 }
 
@@ -61,6 +69,22 @@ function checkPause() {
         isPaused = true;
     } else if (isKeyPressed) {
         isPaused = false;
+    }
+}
+
+
+/**
+ * Check if the user has restarted the sketch to begin a new creation.
+ */
+function checkRestart() {
+    if (isKeyPressed && key === 'r') { // User pressed r key
+        // Reset states of non-static global variables
+        clouds = [];
+        currLinePoints = [];
+        isPaused = false;
+        isDrawing = false;
+
+        refreshGraphicsLayers();
     }
 }
 
@@ -104,7 +128,10 @@ function draw() {
     image(skyLayer, 0, 0);
     image(drawStrokeLayer, 0, 0);
 
+    // Check utilities of the creative space
     checkPause();
+    checkRestart();
+
     // Display each cloud
     clouds = clouds.filter(checkCloudBounds).filter(checkTransparency);
     clouds.forEach((cloud) => {
@@ -156,8 +183,7 @@ function displaySkyGradient(is_window_resized = false) {
 
 
 /**
- * Determine if a Cloud is outside of the window bounds. Not a Cloud method as
- * this function is used when performing Array filtering.
+ * Determine if a Cloud is outside of the window bounds.
  * 
  * @param {Cloud} cloud 
  * @returns true if Cloud within bounds, false otherwise
@@ -176,8 +202,7 @@ function checkCloudBounds(cloud) {
 
 
 /**
- * Determine if a Cloud has become fully transparent. Not a Cloud method as
- * this function is used when performing Array filtering.
+ * Determine if a Cloud has become fully transparent.
  * 
  * @param {Cloud} cloud 
  * @returns true if Cloud is fully transparent, false otherwise
