@@ -13,6 +13,11 @@ let is_drawing = false;
 let sky_layer;
 let draw_stroke_layer;
 let prev_num_clouds = -1;
+let cloud_colors = [
+    [230, 230, 250], [255, 245, 238], [255, 228, 225], [220, 220, 220]
+]; // RGB values for Lavender, SeaShell, MistyRose, and Gainsboro
+
+
 const SKY_COLOR_CHANGE_RATE = 10;
 const TRANSPARENCY_CHANGE_RATE = 1;
 
@@ -155,6 +160,7 @@ class Cloud {
         this.coordinates = coordinates; // Coordinates of the bounding line
 
         this.vectors = [];
+        this.color = random(cloud_colors);
         this.transparency = 255;
 
         // TODO: change speed
@@ -164,7 +170,8 @@ class Cloud {
 
     display() {
         // Specify the fill color for the Cloud
-        fill(255, 0, 0, this.transparency);
+        let [r, g, b] = this.color; // Unpack assigned color
+        fill(r, g, b, this.transparency);
         noStroke();
 
         this.vectors = []; // Reset vectors
@@ -173,7 +180,7 @@ class Cloud {
         beginShape();
         this.coordinates.forEach((coordinate) => {
             // Every 60 frames, offset the coordinates to perform wiggle effect
-            if (frameCount % 60 === 0) {
+            if (frameCount % 60 === 0 && !is_paused) {
                 coordinate[0] += random(-10, 10) * noise(0.05 * frameCount);
                 coordinate[1] += random(-5, 5) * noise(0.05 * frameCount);
             }
