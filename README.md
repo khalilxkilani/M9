@@ -47,6 +47,7 @@ Text.
 * [Hosting a p5.js Sketch with Github Pages](https://youtu.be/ZneWjyn18e8?feature=shared) by The Coding Train on YouTube.
 * [2.6: createGraphics() - p5.js Tutorial](https://youtu.be/TaluaAD9MKA?si=-PxropzQQv_ftfrA) by The Coding Train on YouTube.
 * [How to Make Objects Bounce Off Walls in the p5.js Programming Language](https://youtu.be/Kp070rI_G48?feature=shared) by Jason Erdreich on YouTube.
+* [p5.js | 5 minute challenge | Mouse Trail](https://youtu.be/jiwg4H8a3fI?feature=shared) by The Coding Kid on YouTube.
 
 **Miscellaneous:**
 * [p5.collide2D Library](https://github.com/bmoren/p5.collide2D.git) on GitHub.

@@ -6,8 +6,9 @@
  */
 
 
-let clouds = []; // Array of Clouds
-let currLinePoints = [];
+let clouds = [];
+let currLinePoints = []; // Points that define shape of a Cloud
+let strokeTrail = []; // Vectors that define the mouse trail
 let cloudColors = [
     [230, 230, 250], [255, 245, 238], [255, 228, 225], [220, 220, 220]
 ]; // RGB values for Lavender, SeaShell, MistyRose, and Gainsboro
@@ -20,6 +21,7 @@ let font;
 let fontsize = 56;
 const SKY_GRADIENT_RATE = 10; // Rate at which gradient changes colors
 const TRANSPARENCY_RATE = 1; // Rate at which clouds lose transparency
+const DRAWING_RESISTANCE = 5; // Amount to offset Cloud line points
 
 
 /**
@@ -27,6 +29,7 @@ const TRANSPARENCY_RATE = 1; // Rate at which clouds lose transparency
  */
 function setup() {
     createCanvas(innerWidth, innerHeight);
+    noCursor();
 
     // Initialize graphics buffer for intermediate draw strokes
     skyLayer = createGraphics(innerWidth, innerHeight);
@@ -120,11 +123,14 @@ function checkRestart() {
 function mouseDragged() {
     if (!isPaused) { // Only draw if user has allowed movement
         isDrawing = true;
-        drawStrokeLayer.strokeWeight(2);
+        // drawStrokeLayer.strokeWeight(2);
+
+        // Add resistance against the user's intended cloud drawing
+        let offset = random(-DRAWING_RESISTANCE, DRAWING_RESISTANCE);
 
         // Make line by connecting previous mouse coordinates
-        drawStrokeLayer.line(pmouseX, pmouseY, mouseX, mouseY);
-        currLinePoints.push([mouseX, mouseY]);
+        // drawStrokeLayer.line(pmouseX, pmouseY, mouseX, mouseY);
+        currLinePoints.push([mouseX + offset, mouseY + offset]);
     }
 }
 
@@ -153,6 +159,9 @@ function draw() {
     image(skyLayer, 0, 0);
     image(drawStrokeLayer, 0, 0);
 
+    // Add a trail to the cursor movement
+    drawStrokeTrail();
+
     // Check utilities of the creative space
     checkPause();
     checkRestart();
@@ -166,6 +175,32 @@ function draw() {
         }
         cloud.display();
     });
+}
+
+
+/**
+ * Draws a trail behind the mouse that shows past movement and current location
+ * in place of a standard cursor arrow.
+ */
+function drawStrokeTrail() {
+    strokeTrail.push([mouseX, mouseY]); // Save current coordinates
+    noStroke();
+
+    // Limit trail to 50 copies
+    if (strokeTrail.length > 50) {
+        strokeTrail.shift(); // Removes first copy
+    }
+
+    // Apportion transparency evenly among all copies
+    let transparency = 255 / strokeTrail.length;
+
+    // Draw all trail copies in gold color, from smallest to biggest
+    for (let i = 0; i < strokeTrail.length; i++) {
+        // Subsequent copies are smaller and more transparent
+        fill(255, 215, 0, (transparency * i));
+        let currCoords = strokeTrail[i];
+        circle(currCoords[0], currCoords[1], i / 5);
+    }
 }
 
 
