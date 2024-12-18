@@ -40,6 +40,7 @@ Text.
 * [Create Graphics](https://p5js.org/examples/advanced-canvas-rendering-create-graphics/) on p5.js.
 * [endShape()](https://p5js.org/reference/p5/endShape/) on p5.js.
 * [noise()](https://p5js.org/reference/p5/noise/) on p5.js.
+* [text()](https://p5js.org/reference/p5/text/) on p5.js.
 * [Color Gradients](https://p5js.org/tutorials/color-gradients/) by Jules Kris and Tristan Bunn on p5.js.
 
 **YouTube:**

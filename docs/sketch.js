@@ -16,6 +16,8 @@ let isDrawing = false;
 let skyLayer;
 let drawStrokeLayer;
 let prevNumClouds = -1; // Set negative so program can use range 0 <= i <= n
+let font;
+let fontsize = 56;
 const SKY_GRADIENT_RATE = 10; // Rate at which gradient changes colors
 const TRANSPARENCY_RATE = 1; // Rate at which clouds lose transparency
 
@@ -65,11 +67,34 @@ function refreshGraphicsLayers() {
  * Check if the user has paused movement to save their creation.
  */
 function checkPause() {
+    if (isPaused) {
+        displayPauseText();
+    }
+
     if (isKeyPressed && keyCode === UP_ARROW) { // User pressed up arrow
         isPaused = true;
     } else if (isKeyPressed) {
         isPaused = false;
     }
+}
+
+
+/**
+ * Display text on pause window for when user shares their creation.
+ */
+function displayPauseText() {
+    textFont('Courier New');
+    textStyle(BOLD);
+    textSize(fontsize);
+    textAlign(CENTER, TOP);
+
+    // White text with black outline
+    fill(255);
+    stroke(0);
+    strokeWeight(4);
+
+    // Center text near top of window
+    text("Look! It's a...", innerWidth / 2, innerHeight / 10);
 }
 
 
