@@ -87,7 +87,7 @@ function keyPressed() {
             isPaused = false;
             noCursor(); // Disable cursor to emphasize mouse trail
         }
-    } else if (keyCode === 32) { // Continue
+    } else if (keyCode === 32 && !isCreativeSpaceEnabled) { // Continue
         isCreativeSpaceEnabled = true;
         noCursor(); // Disable cursor to emphasize mouse trail
     } else if (key === 'r' && isCreativeSpaceEnabled) { // Restart
