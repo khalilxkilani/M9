@@ -229,9 +229,8 @@ function draw() {
     if (!isCreativeSpaceEnabled) {
         displayInstructions();
     } else { // User has continued to creative space
-        // Display drawing buffers from top left
+        // Display sky buffer first, starting at top left
         image(skyLayer, 0, 0);
-        image(drawStrokeLayer, 0, 0);
 
         // Remove Clouds that have become fully transparent or moved out of bounds
         clouds = clouds.filter(checkCloudBounds).filter(checkTransparency);
@@ -243,6 +242,9 @@ function draw() {
             }
             cloud.display();
         });
+
+        // Display draw stroke buffer last
+        image(drawStrokeLayer, 0, 0);
 
         // Enable cursor, show pause text, and clear stroke trail when paused
         if (isPaused) {
