@@ -231,14 +231,6 @@ function draw() {
         image(skyLayer, 0, 0);
         image(drawStrokeLayer, 0, 0);
 
-        // Enable cursor, show pause text, and clear stroke trail when paused
-        if (isPaused) {
-            displayPauseText();
-            strokeTrail = [];
-        } else {
-            drawStrokeTrail(); // Add a trail to the cursor movement when unpaused
-        }
-
         // Remove Clouds that have become fully transparent or moved out of bounds
         clouds = clouds.filter(checkCloudBounds).filter(checkTransparency);
         // Display each Cloud
@@ -249,6 +241,14 @@ function draw() {
             }
             cloud.display();
         });
+
+        // Enable cursor, show pause text, and clear stroke trail when paused
+        if (isPaused) {
+            displayPauseText();
+            strokeTrail = [];
+        } else {
+            drawStrokeTrail(); // Add a trail to the cursor movement when unpaused
+        }
     }
 }
 
