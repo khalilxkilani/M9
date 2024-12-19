@@ -73,12 +73,16 @@ function refreshGraphicsLayers() {
  */
 function checkPause() {
     if (isPaused) {
+        cursor(CROSS); // Enable cursor when paused
         displayPauseText();
+    } else {
+        noCursor(); // Disable cursor due to emphasize mouse trail
     }
 
     if (isKeyPressed && keyCode === UP_ARROW) { // User pressed up arrow
         isPaused = true;
     } else if (isKeyPressed) {
+        drawStrokeLayer.clear(); // Clear the drawing buffer of previous writing
         isPaused = false;
     }
 }
@@ -98,8 +102,8 @@ function displayPauseText() {
     stroke(0);
     strokeWeight(4);
 
-    // Center text near top of window
-    text("Look! It's a...", innerWidth / 2, innerHeight / 10);
+    // Center text near top of window, where underscores hold user scribble
+    text("Look! It's a __________", innerWidth / 2, innerHeight / 10);
 }
 
 
@@ -152,14 +156,24 @@ function doubleClicked() {
 function mouseDragged() {
     if (!isPaused) { // Only draw if user has allowed movement
         isDrawing = true;
-        // drawStrokeLayer.strokeWeight(2);
+
+        // Set properties of Cloud's golden outline
+        drawStrokeLayer.strokeWeight(2);
+        drawStrokeLayer.stroke(255, 215, 0);
 
         // Add resistance against the user's intended Cloud drawing
         let offset = random(-DRAWING_RESISTANCE, DRAWING_RESISTANCE);
 
-        // Make line by connecting previous mouse coordinates
-        // drawStrokeLayer.line(pmouseX, pmouseY, mouseX, mouseY);
+        // Form line by connecting previous mouse coordinates and create a
+        // temporary golden outline of the Cloud
+        drawStrokeLayer.line(pmouseX, pmouseY, mouseX, mouseY);
         currLinePoints.push([mouseX + offset, mouseY + offset]);
+    } else {
+        // Set properties of handwriting scribble during pause
+        drawStrokeLayer.stroke(0, 0, 0);
+        drawStrokeLayer.strokeWeight(4);
+        // Draw the handwriting scribble
+        drawStrokeLayer.line(pmouseX, pmouseY, mouseX, mouseY);
     }
 }
 
@@ -168,7 +182,8 @@ function mouseDragged() {
  * Create a Cloud using stored line coordinates upon mouse drag completion.
  */
 function mouseReleased() {
-    if (isDrawing) { // Only create Cloud if one was drawn (omit mouse presses)
+    // Only create Cloud if one was drawn (omit single mouse presses)
+    if (isDrawing && !isPaused) {
         isDrawing = false;
         clouds.push(new Cloud(currLinePoints)); // Create Cloud
         currLinePoints = []; // Reset line coordinates for next Cloud
@@ -188,12 +203,12 @@ function draw() {
     image(skyLayer, 0, 0);
     image(drawStrokeLayer, 0, 0);
 
-    // Add a trail to the cursor movement
-    drawStrokeTrail();
-
-    // Check utilities of the creative space
-    checkPause();
-    checkRestart();
+    // Add a trail to the cursor movement when unpaused
+    if (!isPaused) {
+        drawStrokeTrail();
+    } else {
+        strokeTrail = []; // Clear the stroke trail when paused
+    }
 
     // Remove Clouds that have become fully transparent or moved out of bounds
     clouds = clouds.filter(checkCloudBounds).filter(checkTransparency);
@@ -205,6 +220,10 @@ function draw() {
         }
         cloud.display();
     });
+
+    // Check utilities of the creative space
+    checkPause();
+    checkRestart();
 }
 
 
@@ -216,8 +235,8 @@ function drawStrokeTrail() {
     strokeTrail.push([mouseX, mouseY]); // Save current coordinates
     noStroke();
 
-    // Limit trail to 50 copies
-    if (strokeTrail.length > 50) {
+    // Limit trail to 100 copies
+    if (strokeTrail.length > 100) {
         strokeTrail.shift(); // Removes first copy
     }
 
@@ -229,7 +248,7 @@ function drawStrokeTrail() {
         // Subsequent copies are smaller and more transparent
         fill(255, 215, 0, (transparency * i));
         let currCoords = strokeTrail[i];
-        circle(currCoords[0], currCoords[1], i / 5);
+        circle(currCoords[0], currCoords[1], i / 8);
     }
 }
 

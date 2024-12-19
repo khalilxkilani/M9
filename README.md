@@ -41,6 +41,7 @@ Text.
 * [endShape()](https://p5js.org/reference/p5/endShape/) on p5.js.
 * [noise()](https://p5js.org/reference/p5/noise/) on p5.js.
 * [text()](https://p5js.org/reference/p5/text/) on p5.js.
+* [doubleClicked()](https://p5js.org/reference/p5/doubleClicked/) on p5.js.
 * [Color Gradients](https://p5js.org/tutorials/color-gradients/) by Jules Kris and Tristan Bunn on p5.js.
 
 **YouTube:**
