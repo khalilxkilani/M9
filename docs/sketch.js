@@ -14,11 +14,13 @@ let cloudColors = [
 ]; // RGB values for Lavender, SeaShell, MistyRose, and Gainsboro
 let isPaused = false;
 let isDrawing = false;
+let isCreativeSpaceEnabled = false;
+let instructionsImage;
 let skyLayer;
 let drawStrokeLayer;
-let prevNumClouds = -1; // Set negative so program can use range 0 <= i <= n
 let font;
 let fontsize = 56;
+let prevNumClouds = -1; // Set negative so program can use range 0 <= i <= n
 const SKY_GRADIENT_RATE = 10; // Rate at which gradient changes colors
 const TRANSPARENCY_RATE = 1; // Rate at which Clouds lose transparency
 const DRAWING_RESISTANCE = 5; // Amount to offset Cloud line points
@@ -31,7 +33,10 @@ const SCATTER_SPEED = 20; // Speed at which Clouds scatter upon double click
  */
 function setup() {
     createCanvas(innerWidth, innerHeight);
-    noCursor();
+    cursor(CROSS);
+
+    // Load instructions image
+    instructionsImage = loadImage('static/instructions.png');
 
     // Initialize graphics buffer for intermediate draw strokes
     skyLayer = createGraphics(innerWidth, innerHeight);
@@ -49,6 +54,7 @@ function setup() {
 function windowResized() {
     resizeCanvas(windowWidth, windowHeight);
     refreshGraphicsLayers();
+    instructionsImage = loadImage('static/instructions.png');
 }
 
 
@@ -69,21 +75,32 @@ function refreshGraphicsLayers() {
 
 
 /**
- * Check if the user has paused movement to save their creation.
+ * Check if the user has paused, unpaused, restarted, or continued.
  */
-function checkPause() {
-    if (isPaused) {
-        cursor(CROSS); // Enable cursor when paused
-        displayPauseText();
-    } else {
-        noCursor(); // Disable cursor due to emphasize mouse trail
-    }
-
-    if (isKeyPressed && keyCode === UP_ARROW) { // User pressed up arrow
-        isPaused = true;
-    } else if (isKeyPressed) {
-        drawStrokeLayer.clear(); // Clear the drawing buffer of previous writing
+function keyPressed() {
+    if (keyCode === UP_ARROW && isCreativeSpaceEnabled) { // Pause
+        if (!isPaused) { // Pause
+            isPaused = true;
+            cursor(CROSS);
+        } else { // Unpause
+            drawStrokeLayer.clear(); // Clear the drawing buffer of previous writing
+            isPaused = false;
+            noCursor(); // Disable cursor to emphasize mouse trail
+        }
+    } else if (keyCode === 32) { // Continue
+        isCreativeSpaceEnabled = true;
+        noCursor(); // Disable cursor to emphasize mouse trail
+    } else if (key === 'r' && isCreativeSpaceEnabled) { // Restart
+        // Reset states of non-static global variables
+        clouds = [];
+        currLinePoints = [];
+        strokeTrail = [];
         isPaused = false;
+        isDrawing = false;
+        isCreativeSpaceEnabled = false;
+
+        refreshGraphicsLayers();
+        cursor(CROSS);
     }
 }
 
@@ -104,22 +121,6 @@ function displayPauseText() {
 
     // Center text near top of window, where underscores hold user scribble
     text("Look! It's a __________", innerWidth / 2, innerHeight / 10);
-}
-
-
-/**
- * Check if the user has restarted the sketch to begin a new creation.
- */
-function checkRestart() {
-    if (isKeyPressed && key === 'r') { // User pressed r key
-        // Reset states of non-static global variables
-        clouds = [];
-        currLinePoints = [];
-        isPaused = false;
-        isDrawing = false;
-
-        refreshGraphicsLayers();
-    }
 }
 
 
@@ -154,7 +155,7 @@ function doubleClicked() {
  * Draw and store the line coordinates of every mouse drag.
  */
 function mouseDragged() {
-    if (!isPaused) { // Only draw if user has allowed movement
+    if (!isPaused && isCreativeSpaceEnabled) { // Only draw if user has allowed movement
         isDrawing = true;
 
         // Set properties of Cloud's golden outline
@@ -168,7 +169,7 @@ function mouseDragged() {
         // temporary golden outline of the Cloud
         drawStrokeLayer.line(pmouseX, pmouseY, mouseX, mouseY);
         currLinePoints.push([mouseX + offset, mouseY + offset]);
-    } else {
+    } else if (isCreativeSpaceEnabled) {
         // Set properties of handwriting scribble during pause
         drawStrokeLayer.stroke(0, 0, 0);
         drawStrokeLayer.strokeWeight(4);
@@ -183,7 +184,7 @@ function mouseDragged() {
  */
 function mouseReleased() {
     // Only create Cloud if one was drawn (omit single mouse presses)
-    if (isDrawing && !isPaused) {
+    if (isDrawing && !isPaused && isCreativeSpaceEnabled) {
         isDrawing = false;
         clouds.push(new Cloud(currLinePoints)); // Create Cloud
         currLinePoints = []; // Reset line coordinates for next Cloud
@@ -193,37 +194,62 @@ function mouseReleased() {
 
 
 /**
+ * Display the instructions image at the start and whenever creative
+ * space is reset.
+ */
+function displayInstructions() {
+    imageMode(CENTER);
+
+    // Test new height if width is 75% of window width according to aspect ratio
+    let newHeight = ((innerWidth * 0.75) / instructionsImage.width)
+        * instructionsImage.height;
+
+    // Resize image according to height if overflow
+    if (newHeight > innerHeight) {
+        instructionsImage.resize(0, innerHeight * 0.75);
+    } else { // Otherwise, resize image according to width
+        instructionsImage.resize(innerWidth * 0.75, 0);
+    }
+    image(instructionsImage, innerWidth / 2, innerHeight / 2);
+}
+
+
+/**
  * Draw the sky gradient and Clouds every frame.
  */
 function draw() {
     clear(); // Clear the background
     displaySkyGradient();
-
-    // Display drawing buffers from top left
+    imageMode(CORNER);
     image(skyLayer, 0, 0);
-    image(drawStrokeLayer, 0, 0);
 
-    // Add a trail to the cursor movement when unpaused
-    if (!isPaused) {
-        drawStrokeTrail();
-    } else {
-        strokeTrail = []; // Clear the stroke trail when paused
-    }
+    // Show the instructions until the user continues to creative space
+    if (!isCreativeSpaceEnabled) {
+        displayInstructions();
+    } else { // User has continued to creative space
+        // Display drawing buffers from top left
+        image(skyLayer, 0, 0);
+        image(drawStrokeLayer, 0, 0);
 
-    // Remove Clouds that have become fully transparent or moved out of bounds
-    clouds = clouds.filter(checkCloudBounds).filter(checkTransparency);
-    // Display each Cloud
-    clouds.forEach((cloud) => {
-        if (!isPaused) { // Only move Clouds if user has allowed movement
-            cloud.move();
-            cloud.dissipate();
+        // Enable cursor, show pause text, and clear stroke trail when paused
+        if (isPaused) {
+            displayPauseText();
+            strokeTrail = [];
+        } else {
+            drawStrokeTrail(); // Add a trail to the cursor movement when unpaused
         }
-        cloud.display();
-    });
 
-    // Check utilities of the creative space
-    checkPause();
-    checkRestart();
+        // Remove Clouds that have become fully transparent or moved out of bounds
+        clouds = clouds.filter(checkCloudBounds).filter(checkTransparency);
+        // Display each Cloud
+        clouds.forEach((cloud) => {
+            if (!isPaused) { // Only move Clouds if user has allowed movement
+                cloud.move();
+                cloud.dissipate();
+            }
+            cloud.display();
+        });
+    }
 }
 
 
@@ -263,30 +289,28 @@ function drawStrokeTrail() {
 function displaySkyGradient(is_window_resized = false) {
     let numClouds = clouds.length; // Obtain number of Clouds currently visible
 
-    // Only redraw the sky gradient if the number of Clouds has changed
-    if (!is_window_resized && numClouds === prevNumClouds) {
-        return;
-    } else {
+    // Only redraw sky gradient if window resized or num Clouds has changed
+    if (is_window_resized || numClouds !== prevNumClouds) {
         prevNumClouds = numClouds;
         skyLayer.clear(); // Clear the sky buffer
-    }
 
-    // Adjust B value down for darker, up for lighter
-    let blueHue = color(0, 150 - (numClouds * SKY_GRADIENT_RATE),
-        255 - (numClouds * SKY_GRADIENT_RATE));
+        // Adjust B value down for darker, up for lighter
+        let blueHue = color(0, 150 - (numClouds * SKY_GRADIENT_RATE),
+            255 - (numClouds * SKY_GRADIENT_RATE));
 
-    // Adjust R,G,B values down for darker, up for lighter
-    let greyRGB = 225 - (numClouds * SKY_GRADIENT_RATE);
-    let greyHue = color(greyRGB, greyRGB, greyRGB);
+        // Adjust R,G,B values down for darker, up for lighter
+        let greyRGB = 225 - (numClouds * SKY_GRADIENT_RATE);
+        let greyHue = color(greyRGB, greyRGB, greyRGB);
 
-    // Draw horizontal lines per height pixel using a different blue-grey blend
-    for (let y = 0; y < innerHeight; y += 1) {
-        // Determine how much to interpolate between both colors
-        let amount = map(y, 0, innerHeight, 0, 1);
-        // Lerp to blend both colors
-        let gradient = lerpColor(blueHue, greyHue, amount);
-        skyLayer.stroke(gradient);
-        skyLayer.line(0, y, innerWidth, y);
+        // Draw horizontal lines per height pixel using a different blue-grey blend
+        for (let y = 0; y < innerHeight; y += 1) {
+            // Determine how much to interpolate between both colors
+            let amount = map(y, 0, innerHeight, 0, 1);
+            // Lerp to blend both colors
+            let gradient = lerpColor(blueHue, greyHue, amount);
+            skyLayer.stroke(gradient);
+            skyLayer.line(0, y, innerWidth, y);
+        }
     }
 }
 
