@@ -87,7 +87,7 @@ function keyPressed() {
             isPaused = true;
             cursor(CROSS);
         } else { // Unpause
-            drawStrokeLayer.clear(); // Clear the drawing buffer of previous writing
+            drawStrokeLayer.clear(); // Clear drawing buffer of previous writing
             isPaused = false;
             noCursor(); // Disable cursor to emphasize mouse trail
         }
@@ -161,7 +161,8 @@ function doubleClicked() {
  * Draw and store the line coordinates of every mouse drag.
  */
 function mouseDragged() {
-    if (!isPaused && isCreativeSpaceEnabled) { // Only draw if user has allowed movement
+    // Only draw if user has allowed movement
+    if (!isPaused && isCreativeSpaceEnabled) {
         isDrawing = true;
 
         // Set properties of Cloud's golden outline
@@ -236,7 +237,7 @@ function draw() {
         // Display sky buffer first, starting at top left
         image(skyLayer, 0, 0);
 
-        // Remove Clouds that have become fully transparent or moved out of bounds
+        // Remove Clouds that are fully transparent or have moved out of bounds
         clouds = clouds.filter(checkCloudBounds).filter(checkTransparency);
         // Display each Cloud
         clouds.forEach((cloud) => {
@@ -255,7 +256,7 @@ function draw() {
             displayPauseText();
             strokeTrail = [];
         } else {
-            drawStrokeTrail(); // Add a trail to the cursor movement when unpaused
+            drawStrokeTrail(); // Add trail to cursor movement when unpaused
         }
     }
 }
@@ -310,7 +311,7 @@ function displaySkyGradient(is_window_resized = false) {
         let greyRGB = 225 - (numClouds * SKY_GRADIENT_RATE);
         let greyHue = color(greyRGB, greyRGB, greyRGB);
 
-        // Draw horizontal lines per height pixel using a different blue-grey blend
+        // Draw horizontal lines per height pixel with different blue-grey blend
         for (let y = 0; y < innerHeight; y += 1) {
             // Determine how much to interpolate between both colors
             let amount = map(y, 0, innerHeight, 0, 1);
