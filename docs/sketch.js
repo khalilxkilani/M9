@@ -128,26 +128,28 @@ function displayPauseText() {
  * Scatter Clouds off the screen when the user double clicks the mouse.
  */
 function doubleClicked() {
-    // Assume Cloud is on the bottom right quadrant of window
-    let newXDir = 1;
-    let newYDir = 1;
+    if (!isPaused && isCreativeSpaceEnabled) {
+        // Assume Cloud is on the bottom right quadrant of window
+        let newXDir = 1;
+        let newYDir = 1;
 
-    // Scatter each Cloud away toward the window quadrant it is closest to
-    clouds.forEach((cloud) => {
-        let [xCoord, yCoord] = cloud.getCenterCoord(); // Middle of Cloud
+        // Scatter each Cloud away toward the window quadrant it is closest to
+        clouds.forEach((cloud) => {
+            let [xCoord, yCoord] = cloud.getCenterCoord(); // Middle of Cloud
 
-        // Cloud is on left half of window
-        if (xCoord < (innerWidth / 2)) {
-            newXDir = -1;
-        }
-        // Cloud is on top half of window
-        if (yCoord < (innerHeight / 2)) {
-            newYDir = -1;
-        }
+            // Cloud is on left half of window
+            if (xCoord < (innerWidth / 2)) {
+                newXDir = -1;
+            }
+            // Cloud is on top half of window
+            if (yCoord < (innerHeight / 2)) {
+                newYDir = -1;
+            }
 
-        // Scatter the Cloud away
-        cloud.scatter(newXDir, newYDir);
-    });
+            // Scatter the Cloud away
+            cloud.scatter(newXDir, newYDir);
+        });
+    }
 }
 
 
