@@ -261,8 +261,8 @@ function drawStrokeTrail() {
     strokeTrail.push([mouseX, mouseY]); // Save current coordinates
     noStroke();
 
-    // Limit trail to 100 copies
-    if (strokeTrail.length > 100) {
+    // Limit trail to 50 copies
+    if (strokeTrail.length > 50) {
         strokeTrail.shift(); // Removes first copy
     }
 
